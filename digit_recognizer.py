@@ -1,8 +1,6 @@
 from keras.models import load_model
-from tkinter import *
 import tkinter as tk
-import win32gui
-from PIL import ImageGrab, Image
+from PIL import ImageGrab, ImageDraw, Image
 import numpy as np
 
 model = load_model('mnist.h5')
@@ -26,7 +24,10 @@ class App(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
         self.x = self.y = 0
+
         # Creating elements
+        self.image = Image.new("RGB", (300, 300), 'white')
+        self.image_draw = ImageDraw.Draw(self.image)
         self.canvas = tk.Canvas(self, width=300, height=300, bg = "white", cursor="cross")
         self.label = tk.Label(self, text="Thinking..", font=("Helvetica", 48))
         self.classify_btn = tk.Button(self, text = "Recognise", command =         self.classify_handwriting)
@@ -44,9 +45,10 @@ class App(tk.Tk):
 
     def classify_handwriting(self):
         HWND = self.canvas.winfo_id() # get the handle of the canvas
-        rect = win32gui.GetWindowRect(HWND) # get the coordinate of the canvas
-        im = ImageGrab.grab(rect)
-        digit, acc = predict_digit(im)
+        # rect = win32gui.GetWindowRect(HWND) # get the coordinate of the canvas
+        # im = ImageGrab.grab(rect)
+        # digit, acc = predict_digit(im)
+        digit, acc = predict_digit(self.image)
         self.label.configure(text= str(digit)+', '+ str(int(acc*100))+'%')
 
     def draw_lines(self, event):
@@ -54,6 +56,7 @@ class App(tk.Tk):
         self.y = event.y
         r=8
         self.canvas.create_oval(self.x-r, self.y-r, self.x + r, self.y + r, fill='black')
+        self.image_draw.ellipse((self.x-r, self.y-r, self.x + r, self.y + r), fill='black')
 
 app = App()
 mainloop()
