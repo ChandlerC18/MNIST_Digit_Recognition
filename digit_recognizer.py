@@ -24,7 +24,7 @@ class App(tk.Tk):
         self.button_clear = tk.Button(self, text="Clear", command=self.clear_all)
 
         # Grid structure
-        self.canvas.grid(row=0, column=0, pady=2, sticky=W)
+        self.canvas.grid(row=0, column=0, pady=2, sticky=tk.W)
         self.label.grid(row=0, column=1,pady=2, padx=2)
         self.classify_btn.grid(row=1, column=1, pady=2, padx=2)
         self.button_clear.grid(row=1, column=0, pady=2)
@@ -36,7 +36,7 @@ class App(tk.Tk):
     def classify_handwriting(self):
         HWND = self.canvas.winfo_id() # get the handle of the canvas
         digit, acc = predict_digit(self.image, self.model)
-        self.label.configure(text= str(digit)+', '+ str(int(acc*100))+'%')
+        self.label.configure(text=f'{digit}, {int(acc * 100)}%')
 
     def draw_lines(self, event):
         self.x = event.x
@@ -52,7 +52,7 @@ def predict_digit(img, model):
     img = img.convert('L') # convert rgb to grayscale
     img = np.array(img)
     img = img.reshape(1,28,28,1) # reshapeto support our model input and normalizing
-    img /= 255.0
+    img = img / 255.0
     res = model.predict([img])[0] # predict class
 
     return np.argmax(res), max(res)
@@ -62,7 +62,7 @@ if __name__ == '__main__':
 
     model_path = 'mnist.h5'
 
-    if not exists('mnist.h5'):
+    if not os.path.exists('mnist.h5'):
         print('Please run build_model.py first to build the classifier model')
         sys.exit()
 
